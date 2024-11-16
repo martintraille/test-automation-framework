@@ -15,14 +15,15 @@ public class Accept {
     private static boolean cookiesAccepted = false;
     public static Performable allCookies() throws InterruptedException {
         return Task.where("{0} accepts all cookies",
-                new Interaction() {
-                    @Override
-                    public <T extends Actor> void performAs(T actor) {
+                actor -> {
                         if (!cookiesAccepted) {
-                            JavascriptExecutor jsExecutor = (JavascriptExecutor) BrowseTheWeb.as(actor).getDriver();
-                            jsExecutor.executeScript("document.querySelector('.vwo-overlay').style.display='none';");
-                            actor.attemptsTo(Click.on(CookieChoicePopUpPage.ACCEPT_ALL_COOKIES_BUTTON));
-                            cookiesAccepted = true;
+                            try {
+                                JavascriptExecutor jsExecutor = (JavascriptExecutor) BrowseTheWeb.as(actor).getDriver();
+                                jsExecutor.executeScript("document.querySelector('.vwo-overlay').style.display='none';");
+                                actor.attemptsTo(Click.on(CookieChoicePopUpPage.ACCEPT_ALL_COOKIES_BUTTON));
+                                cookiesAccepted = true;
+                            } catch (Exception e) {
+                                throw new RuntimeException("Failed to accept cookies", e);
                         }
                     }
                 }
